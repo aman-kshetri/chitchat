@@ -1,19 +1,36 @@
 import React from 'react'
 import assets, {userDummyData} from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 
 const Sidebar = ({selectedUser, setSelectedUser}) => {
 
     const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
   return (
     <div>
         <div>
         <div className='flex justify-between items-center'>
             <img src={assets.logo} alt="logo" className='max-w-40' />
-            <div>
-                <img src={assets.menu_icon} alt="menu" className='max-h-5 cursor-pointer' />
-                <div>
+            <div ref={menuRef} className='relative group'>
+                <button type='button' onClick={() => setMenuOpen(!menuOpen)} className='block' aria-label='Open menu'>
+                    <img src={assets.menu_icon} alt="menu" className='max-h-5 cursor-pointer' />
+                    <span className='absolute right-0 top-full mt-1 hidden whitespace-nowrap text-xs group-hover:block'>More</span>
+                </button>
+                <div className={`absolute right-0 top-full z-10 mt-2 w-32 rounded-md border border-gray-500 bg-[#282142] p-2 shadow-lg ${menuOpen ? 'visible opacity-100' : 'invisible opacity-0'} transition-opacity`}>
                     <p onClick={()=>navigate('/profile')} className='cursor-pointer text-sm'> Edit Profile</p>
                     <hr className='my-2 border-t border-gray-500' />
                     <p className='cursor-pointer text-sm'> Logout</p>            
