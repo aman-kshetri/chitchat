@@ -6,13 +6,13 @@ import ProfilePage from './pages/ProfilePage'
 
 const App = () => {
   return (
-    <>
+    <div className='bg-[#1c28ac] text-white h-screen w-screen overflow-hidden'>
       <Routes>
         <Route path = "/" element = {<HomePage />} />
         <Route path = "/login" element = {<LoginPage />} />
         <Route path = "/profile" element = {<ProfilePage />} />
       </Routes>
-    </>
+    </div>
   )
 }
 
