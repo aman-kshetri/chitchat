@@ -20,6 +20,7 @@ const LoginPage = () => {
   return (
     <div className="flex min-h-full items-center justify-center overflow-y-auto backdrop-blur-2xl">
       <div className="flex w-full max-w-4xl flex-col items-center gap-8 p-4 sm:p-8 md:flex-row md:gap-20">
+        
         {/* Left */}
         <div className="flex w-full justify-center md:w-1/2">
           <img

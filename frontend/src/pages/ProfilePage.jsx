@@ -95,8 +95,7 @@ const ProfilePage = () => {
           <button
             type="submit"
             className="w-full rounded-full bg-[#ec0f0f] px-4 py-3 text-sm font-medium transition hover:bg-[#d90d0d]"
-          >
-            Save changes
+          > Save changes
           </button>
         </form>
       </div>
