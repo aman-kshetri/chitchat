@@ -1,5 +1,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
@@ -7,6 +8,7 @@ import ProfilePage from './pages/ProfilePage'
 const App = () => {
   return (
     <div className='bg-[#1c28ac] text-white h-screen w-screen overflow-hidden'>
+      <Toaster />
       <Routes>
         <Route path = "/" element = {<HomePage />} />
         <Route path = "/login" element = {<LoginPage />} />
