@@ -1,18 +1,31 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import assets from "../assets/assets";
+import { AuthContext } from "../../context/AuthContext";
 
 const ProfilePage = () => {
+
+  const {authUser, updateProfile} = useContext(AuthContext);
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
-  const [name, setName] = useState("Martin Johnson");
-  const [bio, setBio] = useState(
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.",
-  );
+  const [name, setName] = useState(authUser.fullName);
+  const [bio, setBio] = useState(authUser.bio);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(!selectedImage) {
+      await updateProfile({ fullName: name, bio });
     navigate("/");
+    return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedImage);
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      await updateProfile({ fullName: name, bio, profilePic: base64Image });
+      navigate("/");
+    };
   };
 
   return (
@@ -98,6 +111,7 @@ const ProfilePage = () => {
           > Save changes
           </button>
         </form>
+        <img src={authUser.profilePic || assets.avatar_logo} alt="" className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 ${selectedImage && 'rounded-full'}`} />
       </div>
     </div>
   );
