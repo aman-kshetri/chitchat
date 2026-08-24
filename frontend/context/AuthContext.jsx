@@ -17,13 +17,19 @@ export const AuthProvider = ({ children }) => {
 
     // Check if the user is authenticated and if so, set the user data and connect to the socket
     const checkAuth = async () => {
+        if (!token) return;
+
         try {
-            await axios.get("/api/auth/check");
+            const { data } = await axios.get("/api/auth/check", {
+                headers: { token },
+            });
             if (data.success) {
                 setAuthUser(data.user);
                 connectSocket(data.user);
             } 
         } catch (error) {
+            localStorage.removeItem("token");
+            setToken(null);
             toast.error(error.message);
         }
     };
@@ -34,10 +40,9 @@ export const AuthProvider = ({ children }) => {
             const { data } = await axios.post(`/api/auth/${state}`, credentials);
             if (data.success) {
                 setAuthUser(data.userData);
-                connection(data.userData);
-                axios.defaults.headers.common["token"] = data.token;
                 setToken(data.token);
                 localStorage.setItem("token", data.token);
+                connectSocket(data.userData);
                 toast.success(data.message);
             } else {
                 toast.error(data.message);
@@ -54,9 +59,8 @@ export const AuthProvider = ({ children }) => {
             setToken(null);
             setAuthUser(null);
             setOnlineUsers([]);
-            axios.defaults.headers.common["token"] = null;
             toast.success("Logged out successfully");
-            socket.disconnect();
+            socket?.disconnect();
         } catch (error) {
             toast.error(error.message);
         }
@@ -65,7 +69,9 @@ export const AuthProvider = ({ children }) => {
     // Update profile function to handle user profile updates
     const updateProfile = async (body) => {
         try {
-            const { data } = await axios.put("/api/auth/update-profile", body);
+            const { data } = await axios.put("/api/auth/update-profile", body, {
+                headers: { token: localStorage.getItem("token") },
+            });
             if (data.success) {
                 setAuthUser(data.user);
                 toast.success("Profile updated successfully");
@@ -90,9 +96,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        if (token) {
-            axios.defaults.headers.common["token"] = token;
-        }
         checkAuth();
     }, [token]);
 

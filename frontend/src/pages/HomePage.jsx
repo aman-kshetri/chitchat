@@ -11,10 +11,7 @@ const HomePage = () => {
       <div
         className={`backdrop-blur-xl border-2 overflow-hidden grid grid-cols-1 relative h-full min-h-0 ${selectedUser ? "md:grid-cols-[1fr_1.5fr_1fr] xl:grid-cols-[1fr_2fr_1fr]" : "md:grid-cols-[1fr_3fr]"}`}
       >
-        <Sidebar
-          selectedUser={selectedUser}
-          setSelectedUser={setSelectedUser}
-        />
+        <Sidebar />
         <ChatContainer
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}

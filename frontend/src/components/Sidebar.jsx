@@ -1,15 +1,22 @@
-import React, {useContext} from "react";
-import assets, { userDummyData } from "../assets/assets";
+import {useContext} from "react";
+import assets from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { ChatContext } from "../../context/ChatContext";
 
-const Sidebar = ({ selectedUser, setSelectedUser }) => {
+const Sidebar = () => {
 
-  const {logout} = useContext(AuthContext);
+  const { getUsers, users, selectedUser, setSelectedUser, unseenMessages } = useContext(ChatContext);
+
+  const {logout, onlineUsers} = useContext(AuthContext);
+  const [input, setInput] = useState("");
+
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  const filteredUsers = input ? users.filter((user) => user.fullName.toLowerCase().includes(input.toLowerCase())) : users;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -21,6 +28,10 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    getUsers();
+  }, [onlineUsers]);
 
   return (
     <div>
@@ -58,7 +69,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
         </div>
         <div>
           <img src={assets.search_icon} alt="Search" className="w-3" />
-          <input
+          <input onChange={(e) => setInput(e.target.value)} value={input}
             type="text"
             placeholder="Search user..."
             className="bg-transparent outline-none text-white placeholder-[#c8c8c8] flex-1"
@@ -66,7 +77,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
         </div>
       </div>
       <div className="flex flex-col">
-        {userDummyData.map((user, index) => (
+        {filteredUsers.map((user) => (
           <div
             onClick={() => setSelectedUser(user)}
             key={user._id}
@@ -79,14 +90,14 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             />
             <div className="flex flex-col">
               <p>{user.fullName}</p>
-              {index < 3 ? (
+              {onlineUsers.includes(user._id) ? (
                 <span className="text-xs text-[#ec0f0f]">Online</span>
               ) : (
                 <span className="text-xs text-[#ec0f0f]">Offline</span>
               )}
-              {index > 2 && (
+              {unseenMessages[user._id] > 0 && (
                 <p className="absolute top-4 right-4 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-violet-500/50">
-                  {index}
+                  {unseenMessages[user._id]}
                 </p>
               )}
             </div>
