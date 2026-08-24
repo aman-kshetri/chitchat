@@ -9,3 +9,6 @@ node_modules/
 
 # Ignore environment files
 .env
+
+
+.DS_Store
