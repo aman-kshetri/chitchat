@@ -14,14 +14,26 @@ const ChatContainer = () => {
   const scrollEnd = useRef(null);
 
   const [input, setInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
   // Handle sending a message
   const handleSendMessage = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+
     const trimmedInput = input.trim();
-    if (!trimmedInput) return;
-    await sendMessage({ text: trimmedInput });
+    if (!trimmedInput || isSending) return;
+
+    setIsSending(true);
     setInput("");
+
+    try {
+      const success = await sendMessage({ text: trimmedInput });
+      if (!success) {
+        setInput(trimmedInput);
+      }
+    } finally {
+      setIsSending(false);
+    }
   };
 
   // Handle sending an image
@@ -31,11 +43,17 @@ const ChatContainer = () => {
       toast.error("Please select a valid image file.");
       return;
     }
+    if (isSending) return;
+
+    setIsSending(true);
     const reader = new FileReader();
     reader.onloadend = async () => {
-      const base64Image = reader.result;
-      await sendMessage({ image: base64Image });
-      e.target.value = ""; // Reset the file input
+      try {
+        await sendMessage({ image: reader.result });
+      } finally {
+        e.target.value = "";
+        setIsSending(false);
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -123,7 +141,8 @@ const ChatContainer = () => {
             onKeyDown={(e) => (e.key === "Enter" ? handleSendMessage(e) : null)}
             type="text"
             placeholder="Type a message..."
-            className="bg-transparent outline-none text-white placeholder-[#c8c8c8] flex-1"
+            disabled={isSending}
+            className="bg-transparent outline-none text-white placeholder-[#c8c8c8] flex-1 disabled:opacity-50"
           />
           <input
             onChange={handleSendImage}
@@ -140,12 +159,18 @@ const ChatContainer = () => {
             />
           </label>
         </div>
-        <img
+        <button
+          type="button"
           onClick={handleSendMessage}
-          src={assets.send_button}
-          alt="send"
-          className="w-7 cursor-pointer"
-        />
+          disabled={isSending}
+          className="flex items-center justify-center disabled:opacity-50"
+        >
+          <img
+            src={assets.send_button}
+            alt="send"
+            className="w-7 cursor-pointer"
+          />
+        </button>
       </div>
     </div>
   ) : (

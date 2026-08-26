@@ -56,11 +56,17 @@ export const getMessages = async (req, res) => {
   }
 };
 
-// API to mark message as seen using messageId
+// API to mark message as seen for all incoming messages from a selected user
 export const markMessageAsSeen = async (req, res) => {
   try {
-    const { messageId } = req.params;
-    await Message.findByIdAndUpdate(id, { seen: true });
+    const { id: senderId } = req.params;
+    const receiverId = req.user._id;
+
+    await Message.updateMany(
+      { senderId, receiverId, seen: false },
+      { $set: { seen: true } },
+    );
+
     res.json({ success: true });
   } catch (error) {
     console.log(error.message);

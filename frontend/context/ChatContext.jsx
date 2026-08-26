@@ -47,7 +47,7 @@ export const ChatProvider = ({ children }) => {
         try {
             if (!selectedUser?._id) {
                 toast.error("Select a user before sending a message.");
-                return;
+                return false;
             }
 
             const { data } = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData, {
@@ -57,11 +57,14 @@ export const ChatProvider = ({ children }) => {
                 setMessages((prevMessages) => [...prevMessages, data.newMessage]);
                 setUnseenMessages((prev) => ({ ...prev, [selectedUser._id]: 0 }));
                 await getUsers();
+                return true;
             } else {
                 toast.error(data.message);
+                return false;
             }
         } catch (error) {
             toast.error(error.message);
+            return false;
         }
     };
 
