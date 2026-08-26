@@ -30,12 +30,15 @@ io.on('connection', (socket) => {
     userSocketMap[userId] = socket.id;
 
     // Emit online users to all connected clients
-    io.emit('getOnlineUsers', Object.keys(userSocketMap));
+    const onlineUsers = Object.keys(userSocketMap);
+    io.emit('onlineUsers', onlineUsers);
+    socket.emit('onlineUsers', onlineUsers);
 
     socket.on('disconnect', () => {
       console.log('User disconnected', userId);
       delete userSocketMap[userId];
-      io.emit('getOnlineUsers', Object.keys(userSocketMap));
+      const updatedUsers = Object.keys(userSocketMap);
+      io.emit('onlineUsers', updatedUsers);
     });
   }
 });
