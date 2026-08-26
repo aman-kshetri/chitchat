@@ -64,7 +64,7 @@ const ProfilePage = () => {
               src={
                 selectedImage
                   ? URL.createObjectURL(selectedImage)
-                  : assets.avatar_icon
+                  : authUser?.profilePic || assets.avatar_icon
               }
               alt=""
               className="h-16 w-16 rounded-full object-cover"
@@ -111,7 +111,7 @@ const ProfilePage = () => {
           > Save changes
           </button>
         </form>
-        <img src={authUser.profilePic || assets.avatar_logo} alt="" className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 ${selectedImage && 'rounded-full'}`} />
+        <img src={authUser?.profilePic || assets.avatar_logo} alt="" className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 ${selectedImage && 'rounded-full'}`} />
       </div>
     </div>
   );

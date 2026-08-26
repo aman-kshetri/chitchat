@@ -17,8 +17,9 @@ const ChatContainer = () => {
   // Handle sending a message
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (input.trim() === "") return;
-    await sendMessage({ text: input.trim });
+    const trimmedInput = input.trim();
+    if (!trimmedInput) return;
+    await sendMessage({ text: trimmedInput });
     setInput("");
   };
 
@@ -39,10 +40,16 @@ const ChatContainer = () => {
   };
 
   useEffect(() => {
-    if (scrollEnd.current) {
+    if (selectedUser) {
+      getMessages(selectedUser._id);
+    }
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (scrollEnd.current && messages) {
       scrollEnd.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, []);
+  }, [messages]);
 
   return selectedUser ? (
     <div className="h-full min-h-0 overflow-hidden relative backdrop-blur-lg flex flex-col">
@@ -55,7 +62,7 @@ const ChatContainer = () => {
         />
         <p>
           {" "}
-          {selectedUser.fullName}
+          {selectedUser.fullName} {onlineUsers.includes(selectedUser._id) && <span className="w-2 h-2 rounded-full bg-green-500"></span>}
           <span className="w-2 h-2 rounded-full bg-green-500"></span>
         </p>
         <img
@@ -69,10 +76,10 @@ const ChatContainer = () => {
 
       {/* Chat area */}
       <div className="min-h-0 flex-1 overflow-y-auto pb-20">
-        {messagesDummyData.map((message, index) => (
+        {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex items-end gap-2 justify-end ${message.senderId !== "680f50e4f10f3cd28382ecf9" && "flex-row-reverse"}`}
+            className={`flex items-end gap-2 justify-end ${message.senderId !== authUser._id && "flex-row-reverse"}`}
           >
             {message.image ? (
               <img
@@ -82,7 +89,7 @@ const ChatContainer = () => {
               />
             ) : (
               <p
-                className={`p-2 max-w-50 md:text-sm font-light rounded-lg mb-8 break-all bg-violet-500/30 text-white ${message.senderId === "680f50e4f10f3cd28382ecf9" ? "rounded-br-none" : "rounded-bl-none"}`}
+                className={`p-2 max-w-50 md:text-sm font-light rounded-lg mb-8 break-all bg-violet-500/30 text-white ${message.senderId === authUser._id ? "rounded-br-none" : "rounded-bl-none"}`}
               >
                 {message.text}
               </p>
@@ -90,9 +97,9 @@ const ChatContainer = () => {
             <div className="text-center text-xs">
               <img
                 src={
-                  message.senderId === "680f50e4f10f3cd28382ecf9"
-                    ? assets.avatar_icon
-                    : assets.profile_martin
+                  message.senderId === authUser._id
+                    ? authUser?.profilePic || assets.avatar_icon
+                    : selectedUser?.profilePic || assets.avatar_icon
                 }
                 alt=""
                 className="w-7 rounded-full"

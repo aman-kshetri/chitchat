@@ -7,7 +7,7 @@ import { ChatContext } from "../../context/ChatContext";
 
 const Sidebar = () => {
 
-  const { getUsers, users, selectedUser, setSelectedUser, unseenMessages } = useContext(ChatContext);
+  const { getUsers, users, selectedUser, setSelectedUser, unseenMessages, setUnseenMessages } = useContext(ChatContext);
 
   const {logout, onlineUsers} = useContext(AuthContext);
   const [input, setInput] = useState("");
@@ -79,7 +79,10 @@ const Sidebar = () => {
       <div className="flex flex-col">
         {filteredUsers.map((user) => (
           <div
-            onClick={() => setSelectedUser(user)}
+            onClick={() => {
+              setSelectedUser(user);
+              setUnseenMessages((prev) => ({ ...prev, [user._id]: 0 }));
+            }}
             key={user._id}
             className={`relative flex items-center gap-2 p-2 pl-4 cursor-pointer ${selectedUser?._id === user._id ? "bg-[#1c28ac]/50" : ""}`}
           >

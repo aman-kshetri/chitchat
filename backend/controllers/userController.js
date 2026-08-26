@@ -81,11 +81,11 @@ export const updateProfile = async (req, res) => {
     } else {
       const upload = await cloudinary.uploader.upload(profilePic);
 
-      uodatedUser = await User.findByIdAndUpdate(
+      updatedUser = await User.findByIdAndUpdate(
         userId,
         { fullName, bio, profilePic: upload.secure_url },
         { new: true },
-      );
+      ).select("-password");
     }
     res.json({ success: true, user: updatedUser });
   } catch (error) {

@@ -45,11 +45,18 @@ export const ChatProvider = ({ children }) => {
     // Function to send a message to a specific user
     const sendMessage = async (messageData) => {
         try {
+            if (!selectedUser?._id) {
+                toast.error("Select a user before sending a message.");
+                return;
+            }
+
             const { data } = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData, {
                 headers: { token: localStorage.getItem("token") },
             });
             if (data.success) {
                 setMessages((prevMessages) => [...prevMessages, data.newMessage]);
+                setUnseenMessages((prev) => ({ ...prev, [selectedUser._id]: 0 }));
+                await getUsers();
             } else {
                 toast.error(data.message);
             }
@@ -61,6 +68,8 @@ export const ChatProvider = ({ children }) => {
     // Function to subscribe to messages for selected user
     const subscribeToMessages = () => {
         if (!socket) return;
+
+        socket.off("newMessage");
         socket.on("newMessage", (newMessage) => {
             if (selectedUser && newMessage.senderId === selectedUser._id) {
                 newMessage.seen = true;
@@ -70,11 +79,16 @@ export const ChatProvider = ({ children }) => {
                 });
             } else {
                 setUnseenMessages((prevUnseenMessages) => ({
-                    ...prevUnseenMessages, [newMessage.senderId]: (prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages [newMessage.senderId] + 1 : 1)
+                    ...prevUnseenMessages,
+                    [newMessage.senderId]: (prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages[newMessage.senderId] + 1 : 1),
                 }));
             }
         });
     };
+
+    useEffect(() => {
+        subscribeToMessages();
+    }, [socket, selectedUser]);
 
     // Function to unsubscribe from messages for selected user
 
