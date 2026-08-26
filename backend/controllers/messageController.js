@@ -75,10 +75,16 @@ export const sendMessage = async (req, res) => {
     const receiverId = req.params.id;
     const senderId = req.user._id;
 
-    let imageUrl;
+    let imageUrl = image || "";
     if (image) {
+      try {
         const uploadResponse = await cloudinary.uploader.upload(image);
-        imageUrl = uploadResponse.secure_url;
+        if (uploadResponse && uploadResponse.secure_url) {
+          imageUrl = uploadResponse.secure_url;
+        }
+      } catch (cloudinaryErr) {
+        console.log("Cloudinary upload error, using raw image data URL fallback:", cloudinaryErr.message);
+      }
     }
 
     const newMessage = await Message.create({

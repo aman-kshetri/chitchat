@@ -24,6 +24,7 @@ import img2 from './img2.jpg'
 
 const assets = {
     avatar_icon,
+    avatar_logo: avatar_icon,
     gallery_icon,
     help_icon,
     logo_big,

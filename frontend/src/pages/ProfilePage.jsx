@@ -4,28 +4,37 @@ import assets from "../assets/assets";
 import { AuthContext } from "../../context/AuthContext";
 
 const ProfilePage = () => {
-
-  const {authUser, updateProfile} = useContext(AuthContext);
+  const { authUser, updateProfile } = useContext(AuthContext);
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
-  const [name, setName] = useState(authUser.fullName);
-  const [bio, setBio] = useState(authUser.bio);
+  const [name, setName] = useState(authUser?.fullName || "");
+  const [bio, setBio] = useState(authUser?.bio || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(!selectedImage) {
-      await updateProfile({ fullName: name, bio });
-    navigate("/");
-    return;
-    }
+    setIsSubmitting(true);
+    try {
+      if (!selectedImage) {
+        await updateProfile({ fullName: name, bio });
+        navigate("/");
+        return;
+      }
 
-    const reader = new FileReader();
-    reader.readAsDataURL(selectedImage);
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      await updateProfile({ fullName: name, bio, profilePic: base64Image });
-      navigate("/");
-    };
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64Image = reader.result;
+        await updateProfile({ fullName: name, bio, profilePic: base64Image });
+        setIsSubmitting(false);
+        navigate("/");
+      };
+      reader.onerror = () => {
+        setIsSubmitting(false);
+      };
+      reader.readAsDataURL(selectedImage);
+    } catch (error) {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -107,11 +116,12 @@ const ProfilePage = () => {
 
           <button
             type="submit"
-            className="w-full rounded-full bg-[#ec0f0f] px-4 py-3 text-sm font-medium transition hover:bg-[#d90d0d]"
-          > Save changes
+            disabled={isSubmitting}
+            className="w-full rounded-full bg-[#ec0f0f] px-4 py-3 text-sm font-medium transition hover:bg-[#d90d0d] disabled:opacity-50"
+          >
+            {isSubmitting ? "Saving changes..." : "Save changes"}
           </button>
         </form>
-        <img src={authUser?.profilePic || assets.avatar_logo} alt="" className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 ${selectedImage && 'rounded-full'}`} />
       </div>
     </div>
   );

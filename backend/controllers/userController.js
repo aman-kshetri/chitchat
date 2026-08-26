@@ -79,11 +79,19 @@ export const updateProfile = async (req, res) => {
       await User.findByIdAndUpdate(userId, { fullName, bio }, { new: true });
       updatedUser = await User.findById(userId).select("-password");
     } else {
-      const upload = await cloudinary.uploader.upload(profilePic);
+      let imageUrl = profilePic;
+      try {
+        const upload = await cloudinary.uploader.upload(profilePic);
+        if (upload && upload.secure_url) {
+          imageUrl = upload.secure_url;
+        }
+      } catch (cloudinaryErr) {
+        console.log("Cloudinary upload error, using raw image data URL fallback:", cloudinaryErr.message);
+      }
 
       updatedUser = await User.findByIdAndUpdate(
         userId,
-        { fullName, bio, profilePic: upload.secure_url },
+        { fullName, bio, profilePic: imageUrl },
         { new: true },
       ).select("-password");
     }

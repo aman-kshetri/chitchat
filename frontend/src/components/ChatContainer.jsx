@@ -3,6 +3,7 @@ import assets, { messagesDummyData } from "../assets/assets";
 import { formatMessageTime } from "../lib/utils";
 import { ChatContext } from "../../context/ChatContext";
 import { AuthContext } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const ChatContainer = () => {
   const { messages, selectedUser, setSelectedUser, sendMessage, getMessages } =
@@ -79,7 +80,7 @@ const ChatContainer = () => {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex items-end gap-2 justify-end ${message.senderId !== authUser._id && "flex-row-reverse"}`}
+            className={`flex items-end gap-2 justify-end ${message.senderId !== authUser._id ? "flex-row-reverse" : ""}`}
           >
             {message.image ? (
               <img
