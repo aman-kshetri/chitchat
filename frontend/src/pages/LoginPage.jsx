@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import toast from "react-hot-toast";
 import assets from "../assets/assets";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -8,18 +9,67 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
+  const [validationError, setValidationError] = useState("");
 
   const { login } = useContext(AuthContext);
 
+  const validateEmail = (value) => /\S+@\S+\.\S+/.test(value.trim());
+
+  const showValidationError = (message) => {
+    setValidationError(message);
+    toast.error(message);
+  };
+
   const onSubmitHandler = (e) => {
     e.preventDefault();
+    setValidationError("");
+    toast.dismiss();
+
     if (currState === "Sign Up" && !isDataSubmitted) {
+      const trimmedName = fullName.trim();
+
+      if (!trimmedName || trimmedName.length < 2) {
+        showValidationError("Full name must be at least 2 characters long.");
+        return;
+      }
+
       setIsDataSubmitted(true);
       return;
     }
 
-    login(currState === "Sign Up" ? 'signup' : 'login', { fullName, email, password, bio });
+    const trimmedEmail = email.trim();
+    const trimmedBio = bio.trim();
+
+    if (!trimmedEmail || !validateEmail(trimmedEmail)) {
+      showValidationError("Please enter a valid email address.");
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      showValidationError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    if (currState === "Sign Up") {
+      if (!trimmedBio || trimmedBio.length < 5) {
+        showValidationError("Bio must be at least 5 characters long.");
+        return;
+      }
+
+      if (!agreeTerms) {
+        showValidationError("You must agree to the terms of use and privacy policy.");
+        return;
+      }
+    }
+
+    login(currState === "Sign Up" ? 'signup' : 'login', {
+      fullName: fullName.trim(),
+      email: trimmedEmail,
+      password,
+      bio: trimmedBio,
+    });
   };
 
   return (
@@ -28,11 +78,14 @@ const LoginPage = () => {
         
         {/* Left */}
         <div className="flex w-full justify-center md:w-1/2">
+          <h1 className="text-amber-600 text-3xl">Chit</h1>
           <img
             src={assets.logo_icon}
+            
             alt=""
-            className="w-20 max-w-full sm:w-32 md:w-auto md:max-w-2xl"
+            className="w-16 max-w-full sm:w-24 md:w-32 lg:w-36"
           />
+          <h1 className="text-amber-600 text-3xl">Chat</h1>
         </div>
 
         {/* Right */}
@@ -55,7 +108,13 @@ const LoginPage = () => {
 
             {currState === "Sign Up" && !isDataSubmitted && (
               <input
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => {
+                  setFullName(e.target.value);
+                  if (validationError) {
+                    setValidationError("");
+                    toast.dismiss();
+                  }
+                }}
                 value={fullName}
                 type="text"
                 className="p-2 border border-gray-500 rounded-md focus:outline-none"
@@ -67,7 +126,13 @@ const LoginPage = () => {
             {!isDataSubmitted && (
               <>
                 <input
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (validationError) {
+                      setValidationError("");
+                      toast.dismiss();
+                    }
+                  }}
                   value={email}
                   type="email"
                   placeholder="Email"
@@ -75,7 +140,13 @@ const LoginPage = () => {
                   className="p-2 border border-gray-500 rounded-md focus:outline-none"
                 />
                 <input
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (validationError) {
+                      setValidationError("");
+                      toast.dismiss();
+                    }
+                  }}
                   value={password}
                   type="password"
                   placeholder="Password"
@@ -88,12 +159,22 @@ const LoginPage = () => {
             {currState === "Sign Up" && isDataSubmitted && (
               <textarea
                 rows={4}
-                onChange={(e) => setBio(e.target.value)}
+                onChange={(e) => {
+                  setBio(e.target.value);
+                  if (validationError) {
+                    setValidationError("");
+                    toast.dismiss();
+                  }
+                }}
                 value={bio}
                 placeholder="Provide short bio... "
                 required
                 className="p-2 border border-gray-500 rounded-md focus:outline-none"
               />
+            )}
+
+            {validationError && (
+              <p className="text-sm text-red-400">{validationError}</p>
             )}
 
             <button
@@ -103,12 +184,24 @@ const LoginPage = () => {
               {currState === "Sign Up" ? "Create Account" : "Login Now"}
             </button>
 
-            <div className="flex items-center justify-center gap-2">
-              <input type="checkbox" />
-              <p className="text-xs">
-                Agree to the terms of use and privacy policy.
-              </p>
-            </div>
+            {currState === "Sign Up" && isDataSubmitted && (
+              <div className="flex items-center justify-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={agreeTerms}
+                  onChange={(e) => {
+                    setAgreeTerms(e.target.checked);
+                    if (validationError) {
+                      setValidationError("");
+                      toast.dismiss();
+                    }
+                  }}
+                />
+                <p className="text-xs">
+                  Agree to the terms of use and privacy policy.
+                </p>
+              </div>
+            )}
 
             <div>
               {currState === "Sign Up" ? (
@@ -118,6 +211,9 @@ const LoginPage = () => {
                     onClick={() => {
                       setCurrState("Login");
                       setIsDataSubmitted(false);
+                      setValidationError("");
+                      toast.dismiss();
+                      setAgreeTerms(false);
                     }}
                     className="text-[#ec0f0f] cursor-pointer"
                   >
@@ -128,7 +224,12 @@ const LoginPage = () => {
                 <p>
                   Create an account{" "}
                   <span
-                    onClick={() => setCurrState("Sign Up")}
+                    onClick={() => {
+                      setCurrState("Sign Up");
+                      setValidationError("");
+                      toast.dismiss();
+                      setAgreeTerms(false);
+                    }}
                     className="text-[#ec0f0f] cursor-pointer"
                   >
                     Click here
