@@ -61,17 +61,18 @@ chitchat/
 │   └── README.md
 │
 ├── backend/
-│   ├── controllers/         # Route logic
+│   ├── controllers/                # Route logic
 │   │   ├── userController.js
 │   │   └── messageController.js
-│   ├── models/              # Mongoose schemas
+│   ├── models/                     # Mongoose schemas
 │   │   ├── User.js
 │   │   └── Message.js
-│   ├── routes/              # API routes
+│   ├── routes/                     # API routes
 │   │   ├── userRoutes.js
 │   │   └── messageRoutes.js
-│   ├── middleware/          # Custom middleware
-│   │   └── auth.js          # JWT authentication
+│   ├── middleware/                 # Custom middleware
+│   │   └── auth.js                 # JWT authentication
+│   │   └── authRateLimiter.js      # Rate limiting to prevent brute force attempts
 │   ├── lib/                 # Utility functions
 │   │   ├── db.js            # MongoDB connection
 │   │   ├── utils.js         # Helper functions
