@@ -41,7 +41,7 @@ const RightSidebar = () => {
 
       <div className='px-5 text-xs'>
         <p>Media</p>
-        <div className='grid grid-cols-2 gap-2 mt-2 max-h-[250px] overflow-y-auto'>
+        <div className='grid grid-cols-2 gap-2 mt-2 max-h-62.5 overflow-y-auto'>
           {msgImages.map((url, index) => (
             <div key={`${url}-${index}`} onClick={() => handleOpenMedia(url)} className='cursor-pointer rounded-md overflow-hidden border border-white/10 bg-black/20 aspect-square'>
               <img src={url} alt='Shared media' className='w-full h-full object-cover block' />
@@ -52,7 +52,7 @@ const RightSidebar = () => {
 
       {selectedMedia && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4' onClick={() => setSelectedMedia(null)}>
-          <div className='relative w-[90vw] max-w-[480px] max-h-[80vh] bg-[#0d1117] rounded-xl overflow-hidden border border-white/10 shadow-2xl' onClick={(e) => e.stopPropagation()}>
+          <div className='relative w-[90vw] max-w-120 max-h-[80vh] bg-[#0d1117] rounded-xl overflow-hidden border border-white/10 shadow-2xl' onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setSelectedMedia(null)}
               className='absolute right-3 top-3 z-10 rounded-full bg-black/70 px-3 py-1 text-sm text-white hover:bg-black'
