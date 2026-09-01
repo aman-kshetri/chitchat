@@ -9,6 +9,7 @@ A modern, full-stack real-time chat application built with React, Node.js, Expre
 - **Profile Management**: Update profile picture, name, and bio
 - **Unread Messages**: Track and display unread message count
 - **Message History**: Full message history with sender/receiver info
+- **Rate Limiting**: Authentication endpoints are protected against brute-force attempts
 - **Responsive UI**: Mobile-friendly interface with Tailwind CSS
 - **Modern Stack**: React 19, Vite, Tailwind CSS, Socket.IO
 
